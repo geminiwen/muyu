@@ -27,22 +27,38 @@ class WoodenFishPage extends StatefulWidget {
   State<WoodenFishPage> createState() => _WoodenFishPageState();
 }
 
-class _WoodenFishPageState extends State<WoodenFishPage> {
+class _WoodenFishPageState extends State<WoodenFishPage> with SingleTickerProviderStateMixin {
   final List<_MeritIndicator> _meritIndicators = [];
   // final AudioPlayer _audioPlayer = AudioPlayer();
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     // _loadSound();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.1),
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.1, end: 1.0),
+        weight: 1,
+      ),
+    ]).animate(CurvedAnimation(
+      parent: _scaleController,
+      curve: Curves.easeInOut,
+    ));
   }
-
-  // Future<void> _loadSound() async {
-  //   await _audioPlayer.setSource(AssetSource('muyu.mp3'));
-  // }
 
   void _onTapWoodenFish() {
     // _audioPlayer.resume();
+    _scaleController.forward(from: 0);
     setState(() {
       UniqueKey key = UniqueKey();
       _meritIndicators.add(_MeritIndicator(
@@ -61,35 +77,39 @@ class _WoodenFishPageState extends State<WoodenFishPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-      child:Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 50,
-            width: 100,
-            child: Stack(
-              children: _meritIndicators,
-            ),
-          ),
-          Center(
-            child: GestureDetector(
-              onTap: _onTapWoodenFish,
-              child: Image.asset(
-                'assets/images/muyu.png',
-                width: 200,
-                height: 200,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 50,
+              width: 100,
+              child: Stack(
+                children: _meritIndicators,
               ),
             ),
-          ),
-        ],
+            Center(
+              child: GestureDetector(
+                onTap: _onTapWoodenFish,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Image.asset(
+                    'assets/images/muyu.png',
+                    width: 200,
+                    height: 200,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      )
     );
   }
 
   @override
   void dispose() {
+    _scaleController.dispose();
     // _audioPlayer.dispose();
     super.dispose();
   }
@@ -113,9 +133,18 @@ class _MeritIndicatorState extends State<_MeritIndicator>
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
 
+  final _textOptions = [
+  "\$AMD BULLISH++", "\$NVDA BULLISH++", "\$TSLA BULLISH++", "\$QQQ BULLISH++"
+  ];
+
+  late String _text;
+
   @override
   void initState() {
     super.initState();
+    //random text of _textOptions for _text
+    _text = _textOptions[DateTime.now().millisecondsSinceEpoch % _textOptions.length];
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -147,11 +176,11 @@ class _MeritIndicatorState extends State<_MeritIndicator>
         position: _slideAnimation,
         child: FadeTransition(
           opacity: _opacityAnimation,
-          child: const Text(
-            '+1',
+          child: Text(
+            _text,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
