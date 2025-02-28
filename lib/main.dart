@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,14 +29,13 @@ class WoodenFishPage extends StatefulWidget {
 
 class _WoodenFishPageState extends State<WoodenFishPage> with SingleTickerProviderStateMixin {
   final List<_MeritIndicator> _meritIndicators = [];
-  // final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    // _loadSound();
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -56,8 +55,8 @@ class _WoodenFishPageState extends State<WoodenFishPage> with SingleTickerProvid
     ));
   }
 
-  void _onTapWoodenFish() {
-    // _audioPlayer.resume();
+  void _onTapWoodenFish() async {
+    await _audioPlayer.play(AssetSource('sounds/sound.m4a'));
     _scaleController.forward(from: 0);
     setState(() {
       UniqueKey key = UniqueKey();
@@ -110,7 +109,7 @@ class _WoodenFishPageState extends State<WoodenFishPage> with SingleTickerProvid
   @override
   void dispose() {
     _scaleController.dispose();
-    // _audioPlayer.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 }
