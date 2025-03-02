@@ -93,6 +93,7 @@ class _SettingsState extends State<Settings> {
                     'Fortune',
                     'Personality',
                     'Love',
+                    'Number'
                   ].map((String value) => PopupMenuItem<String>(
                     value: value,
                     child: Text(

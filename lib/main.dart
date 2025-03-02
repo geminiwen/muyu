@@ -149,11 +149,12 @@ class _MeritIndicatorState extends State<_MeritIndicator>
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
 
-  Map<String, List<String>> _allTextOptions = {
+  final Map<String, List<String>> _allTextOptions = {
     'NASDAQ': ["\$AMD BULLISH++", "\$NVDA BULLISH++", "\$TSLA BULLISH++", "\$QQQ BULLISH++"],
     'Fortune': ["Good Fortune!", "Lucky Day!", "Prosperity Ahead!", "Success Coming!"],
     'Personality': ["Be Kind!", "Stay Strong!", "Keep Positive!", "Be Brave!"],
-    'Love': ["Love is Near!", "Heart Full!", "Romance Blooms!", "Soul Connection!"]
+    'Love': ["Love is Near!", "Heart Full!", "Romance Blooms!", "Soul Connection!"],
+    'Number': ["+1"]
   };
 
   List<String> _textOptions = [];
@@ -167,7 +168,7 @@ class _MeritIndicatorState extends State<_MeritIndicator>
     });
   }
 
-  late String _text;
+  String _text = "";
 
   @override
   void initState() {
@@ -205,12 +206,15 @@ class _MeritIndicatorState extends State<_MeritIndicator>
         position: _slideAnimation,
         child: FadeTransition(
           opacity: _opacityAnimation,
-          child: Text(
-            _text,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          child: SizedBox( 
+            width: 500,
+            child: Text(
+              _text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
