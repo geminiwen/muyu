@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:muyu/bridge.dart';
+import 'dart:convert';
+import 'package:muyu/settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:desktop_multi_window/desktop_multi_window.dart';
 
-void main() {
-  runApp(const MyApp());
+void main(List<String> args) async {
+  if (args.firstOrNull == 'multi_window') {
+    final windowId = int.parse(args[1]);
+     final argument = args[2].isEmpty
+        ? const {}
+        : jsonDecode(args[2]) as Map<String, dynamic>;
+    runApp(Settings(
+      windowController: WindowController.fromWindowId(windowId),
+      args: argument,
+    ));
+  } else {
+    await Bridge.initialize();
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -132,17 +149,30 @@ class _MeritIndicatorState extends State<_MeritIndicator>
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
 
-  final _textOptions = [
-  "\$AMD BULLISH++", "\$NVDA BULLISH++", "\$TSLA BULLISH++", "\$QQQ BULLISH++"
-  ];
+  Map<String, List<String>> _allTextOptions = {
+    'NASDAQ': ["\$AMD BULLISH++", "\$NVDA BULLISH++", "\$TSLA BULLISH++", "\$QQQ BULLISH++"],
+    'Fortune': ["Good Fortune!", "Lucky Day!", "Prosperity Ahead!", "Success Coming!"],
+    'Personality': ["Be Kind!", "Stay Strong!", "Keep Positive!", "Be Brave!"],
+    'Love': ["Love is Near!", "Heart Full!", "Romance Blooms!", "Soul Connection!"]
+  };
+
+  List<String> _textOptions = [];
+
+  Future<void> _loadTextOptions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final contentType = prefs.getString('selected_content_type') ?? 'NASDAQ';
+    setState(() {
+      _textOptions = _allTextOptions[contentType] ?? _allTextOptions['NASDAQ']!;
+      _text = _textOptions[DateTime.now().millisecondsSinceEpoch % _textOptions.length];
+    });
+  }
 
   late String _text;
 
   @override
   void initState() {
     super.initState();
-    //random text of _textOptions for _text
-    _text = _textOptions[DateTime.now().millisecondsSinceEpoch % _textOptions.length];
+    _loadTextOptions();
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
